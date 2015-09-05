@@ -39,7 +39,7 @@
   function receiveResponse(e) {
     for (obj of e.data) {
       // console.log(` receiveResponse id: ${obj.id}, color: ${obj.color} `);
-      if (obj.color === -1) {
+      if (obj.color == -1) {
         removeStone(obj.id);
       } else if (obj.color == 0) {
         addBlackStone(obj.id);
@@ -55,15 +55,15 @@
     var worker = new Worker("public/javascripts/worker.js");
     worker.addEventListener("message", receiveResponse, false);
     function sendRequest(e) {
-      // console.log(` sendRequest id: ${e.target.getAttribute('id')}, prefix: ${e.target.getAttribute('prefix')} `)
+      e.stopPropagation();
+      // console.log(` sendRequest id: ${e.target.getAttribute('id')} `);
       if (e.target.tagName == "IMG") {
-        worker.postMessage({ id: e.target.getAttribute('id'), prefix: e.target.getAttribute('prefix') });
+        worker.postMessage({ id: e.target.getAttribute('id') });
       }
     }
     var i;
     for (i = 0; i < document.images.length; ++i) {
       document.images[i].setAttribute('id', i);
-      document.images[i].setAttribute('prefix', "");
     }
     var board = document.getElementsByTagName("table")[0];
     board.addEventListener("click", sendRequest, false);
