@@ -1,54 +1,72 @@
 (function () {
-  function removeStone(a, h, p, t) {
+  function change(id, pattern, prefix, f) {
+    var image = document.getElementById(id);
+    var src = image.getAttribute('src');
+    image.setAttribute('src', src.replace(pattern, f));
+    image.setAttribute('prefix', prefix);
+  }
+
+  function removePrefix(a, h, p, t) {
+    if (a.indexOf('b-') === -1 && a.indexOf('w-') === -1) { return a; }
     var src = h + t;
     return src;
   }
 
-  function addWhite(a, h, t) {
+  function removeStone(id) {
+    change(id, /^(.*\/)([bw]-)(.*\.svg)$/, "", removePrefix);
+  }
+
+  function addWhitePrefix(a, h, t) {
+    if (a.indexOf('b-') !== -1 || a.indexOf('w-') !== -1) { return a; }
     var src = h + "w-" + t;
     return src;
   }
 
-  function addBlack(a, h, t) {
+  function addWhiteStone(id) {
+    change(id, /^(.*\/)(.*\.svg)$/, "w-", addWhitePrefix);
+  }
+
+  function addBlackPrefix(a, h, t) {
+    if (a.indexOf('b-') !== -1 || a.indexOf('w-') !== -1) { return a; }
     var src = h + "b-" + t;
     return src;
   }
 
-  function startup() {
-    function response(e) {
-      console.log(` response id: ${e.data.id}, color: ${e.data.color} `)
-      var image = document.getElementById(e.data.id);
-      if (image !== null) {
-        var src = image.getAttribute('src');
-        if (src.indexOf('b-') !== -1 || src.indexOf('w-') !== -1) {
-          image.setAttribute('src', src.replace(/^(.*\/)([bw]-)(.*\.svg)$/, removeStone));
-          image.setAttribute('color', "");
-        } else {
-          if (e.data.color === 0) {
-            image.setAttribute('src', src.replace(/^(.*\/)(.*\.svg)$/, addBlack));
-            image.setAttribute('color', "0");
-          } else {
-            image.setAttribute('src', src.replace(/^(.*\/)(.*\.svg)$/, addWhite));
-            image.setAttribute('color', "1");
-          }
-        }
+  function addBlackStone(id) {
+    change(id, /^(.*\/)(.*\.svg)$/, "b-", addBlackPrefix);
+  }
+
+  function receiveResponse(e) {
+    for (obj of e.data) {
+      // console.log(` receiveResponse id: ${obj.id}, color: ${obj.color} `);
+      if (obj.color === -1) {
+        removeStone(obj.id);
+      } else if (obj.color == 0) {
+        addBlackStone(obj.id);
+      } else if (obj.color == 1) {
+        addWhiteStone(obj.id);
+      } else {
+        // console.log("should not reache");
       }
     }
+  }
 
-    function request(e) {
-      console.log(` request id: ${e.target.getAttribute('id')}, color: ${e.target.getAttribute('color')} `)
-      worker.postMessage({ id: e.target.getAttribute('id'), color: e.target.getAttribute('color') });
-    }
-
+  function startup() {
     var worker = new Worker("public/javascripts/worker.js");
-    worker.addEventListener("message", response);
-
+    worker.addEventListener("message", receiveResponse, false);
+    function sendRequest(e) {
+      // console.log(` sendRequest id: ${e.target.getAttribute('id')}, prefix: ${e.target.getAttribute('prefix')} `)
+      if (e.target.tagName == "IMG") {
+        worker.postMessage({ id: e.target.getAttribute('id'), prefix: e.target.getAttribute('prefix') });
+      }
+    }
     var i;
     for (i = 0; i < document.images.length; ++i) {
       document.images[i].setAttribute('id', i);
-      document.images[i].setAttribute('color', "");
-      document.images[i].addEventListener("click", request);
+      document.images[i].setAttribute('prefix', "");
     }
+    var board = document.getElementsByTagName("table")[0];
+    board.addEventListener("click", sendRequest, false);
   }
 
   document.onreadystatechange = function () {
