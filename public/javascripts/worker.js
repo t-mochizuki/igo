@@ -10,25 +10,39 @@
     }
   }
 
+  /**
+   * @param {Number} id
+   * @return {Object}
+   */
   function id2coordinate(id) {
     return { row: Math.trunc(id / 19), column: id % 19 };
   }
 
+  /**
+   * @param {Array.<Object>} arr
+   */
   function sendResponse(arr) {
     postMessage(arr);
   }
 
+  /**
+   * @param {Object} s
+   * @param {Number} color
+   * @param {Array.<Number>} checklist
+   * @param {Array.<Number>} removelist
+   * @return {Boolean}
+   */
   function safe(s, color, checklist, removelist) {
     removelist.push(s.id);
 
     if (s.row === 0) {
     } else {
       var u = state[s.row - 1][s.column];
-      if (checklist.indexOf(u.id) == -1) {
+      if (checklist.indexOf(u.id) === -1) {
         checklist.push(u.id);
-        if (u.color == 2) {
+        if (u.color === 2) {
           return true;
-        } else if (u.color != color) {
+        } else if (u.color !== color) {
         } else {
           if (safe(u, color, checklist, removelist)) return true;
         }
@@ -37,11 +51,11 @@
     if (s.column === 18) {
     } else {
       var r = state[s.row][s.column + 1];
-      if (checklist.indexOf(r.id) == -1) {
+      if (checklist.indexOf(r.id) === -1) {
         checklist.push(r.id);
-        if (r.color == 2) {
+        if (r.color === 2) {
           return true;
-        } else if (r.color != color) {
+        } else if (r.color !== color) {
         } else {
           if (safe(r, color, checklist, removelist)) return true;
         }
@@ -50,11 +64,11 @@
     if (s.row === 18) {
     } else {
       var d = state[s.row + 1][s.column];
-      if (checklist.indexOf(d.id) == -1) {
+      if (checklist.indexOf(d.id) === -1) {
         checklist.push(d.id);
-        if (d.color == 2) {
+        if (d.color === 2) {
           return true;
-        } else if (d.color != color) {
+        } else if (d.color !== color) {
         } else {
           if (safe(d, color, checklist, removelist)) return true;
         }
@@ -63,11 +77,11 @@
     if (s.column === 0) {
     } else {
       var l = state[s.row][s.column - 1];
-      if (checklist.indexOf(l.id) == -1) {
+      if (checklist.indexOf(l.id) === -1) {
         checklist.push(l.id);
-        if (l.color == 2) {
+        if (l.color === 2) {
           return true;
-        } else if (l.color != color) {
+        } else if (l.color !== color) {
         } else {
           if (safe(l, color, checklist, removelist)) return true;
         }
@@ -76,13 +90,18 @@
     return false;
   }
 
+  /**
+   * @param {Object} s
+   * @param {Number} yourcolor
+   * @param {Array.<Number>} xs
+   */
   function attack(s, yourcolor, xs) {
     var checklist = [];
     var removelist = [];
     if (s.row === 0) {
     } else {
       var u = state[s.row - 1][s.column];
-      if (u.color != color) {
+      if (u.color !== color) {
         checklist = [];
         removelist = [];
         if (safe(u, yourcolor, checklist, removelist)) {
@@ -90,7 +109,7 @@
         } else {
           "unsafe";
           for (i in removelist) {
-            if (xs.indexOf(removelist[i]) == -1) {
+            if (xs.indexOf(removelist[i]) === -1) {
               xs.push(removelist[i]);
             }
           }
@@ -100,7 +119,7 @@
     if (s.column === 18) {
     } else {
       var r = state[s.row][s.column + 1];
-      if (r.color != color) {
+      if (r.color !== color) {
         checklist = [];
         removelist = [];
         if (safe(r, yourcolor, checklist, removelist)) {
@@ -108,7 +127,7 @@
         } else {
           "unsafe";
           for (i in removelist) {
-            if (xs.indexOf(removelist[i]) == -1) {
+            if (xs.indexOf(removelist[i]) === -1) {
               xs.push(removelist[i]);
             }
           }
@@ -118,7 +137,7 @@
     if (s.row === 18) {
     } else {
       var d = state[s.row + 1][s.column];
-      if (d.color != color) {
+      if (d.color !== color) {
         checklist = [];
         removelist = [];
         if (safe(d, yourcolor, checklist, removelist)) {
@@ -126,7 +145,7 @@
         } else {
           "unsafe";
           for (i in removelist) {
-            if (xs.indexOf(removelist[i]) == -1) {
+            if (xs.indexOf(removelist[i]) === -1) {
               xs.push(removelist[i]);
             }
           }
@@ -136,7 +155,7 @@
     if (s.column === 0) {
     } else {
       var l = state[s.row][s.column - 1];
-      if (l.color != color) {
+      if (l.color !== color) {
         checklist = [];
         removelist = [];
         if (safe(l, yourcolor, checklist, removelist)) {
@@ -144,7 +163,7 @@
         } else {
           "unsafe";
           for (i in removelist) {
-            if (xs.indexOf(removelist[i]) == -1) {
+            if (xs.indexOf(removelist[i]) === -1) {
               xs.push(removelist[i]);
             }
           }
@@ -162,10 +181,10 @@
     var checklist = [];
     var dummylist = [];
 
-    if (s.color != 2) return;
+    if (s.color !== 2) return;
 
     // convenient
-    if (color == 0) {
+    if (color === 0) {
       s.color = 1;
     } else {
       s.color = 0;
@@ -178,7 +197,7 @@
     } else {
       s.color = color;
       attack(s, yourcolor, xs);
-      if (xs.length == 0) {
+      if (xs.length === 0) {
         s.color = 2;
         return;
       }
@@ -199,4 +218,4 @@
   }
 
   addEventListener("message", receiveRequest, false);
-})();
+}());

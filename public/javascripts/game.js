@@ -39,11 +39,11 @@
   function receiveResponse(e) {
     for (obj of e.data) {
       // console.log(` receiveResponse id: ${obj.id}, color: ${obj.color} `);
-      if (obj.color == -1) {
+      if (obj.color === -1) {
         removeStone(obj.id);
-      } else if (obj.color == 0) {
+      } else if (obj.color === 0) {
         addBlackStone(obj.id);
-      } else if (obj.color == 1) {
+      } else if (obj.color === 1) {
         addWhiteStone(obj.id);
       } else {
         // console.log("should not reache");
@@ -57,7 +57,7 @@
     function sendRequest(e) {
       e.stopPropagation();
       // console.log(` sendRequest id: ${e.target.getAttribute('id')} `);
-      if (e.target.tagName == "IMG") {
+      if (e.target.tagName === "IMG") {
         worker.postMessage({ id: e.target.getAttribute('id') });
       }
     }
@@ -70,8 +70,8 @@
   }
 
   document.onreadystatechange = function () {
-    if (document.readyState == "complete") {
+    if (document.readyState === "complete") {
       startup();
     }
   }
-})();
+}());
